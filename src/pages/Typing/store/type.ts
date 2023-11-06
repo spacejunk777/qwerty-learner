@@ -18,6 +18,17 @@ export type ChapterData = {
   wordRecordIds: number[]
 }
 
+export type BlockData = {
+  // warning: 因为有章节内随机的存在，所有记录 index 的场景都应该使用 WordWithIndex.index
+  words: WordWithIndex[]
+  // block index
+  index: number
+  reverseIndex: number
+  status: number
+  blocksize: number
+  testscore: number
+}
+
 export type UserInputLog = {
   // the index in ChapterData.words, not the index in WordWithIndex
   index: number
@@ -43,6 +54,7 @@ export type WrongWordData = {
 
 export type TypingState = {
   chapterData: ChapterData
+  blockData: BlockData
   timerData: TimerData
   isTyping: boolean
   isFinished: boolean

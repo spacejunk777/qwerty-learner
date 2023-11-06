@@ -5,9 +5,9 @@ import Phonetic from './components/Phonetic'
 import Translation from './components/Translation'
 import WordComponent from './components/Word'
 import { usePrefetchPronunciationSound } from '@/hooks/usePronunciation'
-import { isShowPrevAndNextWordAtom, loopWordConfigAtom, phoneticConfigAtom } from '@/store'
+import { isShowPrevAndNextWordAtom, loopWordConfigAtom, phoneticConfigAtom, wordDictationConfigAtom } from '@/store'
 import type { Word } from '@/typings'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 
@@ -21,6 +21,7 @@ export default function WordPanel() {
   const { times: loopWordTimes } = useAtomValue(loopWordConfigAtom)
   const currentWord = state.chapterData.words[state.chapterData.index]
   const nextWord = state.chapterData.words[state.chapterData.index + 1] as Word | undefined
+  const setWordDictationConfig = useSetAtom(wordDictationConfigAtom)
 
   const prevIndex = useMemo(() => {
     const newIndex = state.chapterData.index - 1
@@ -38,19 +39,58 @@ export default function WordPanel() {
   }, [])
 
   const onFinish = useCallback(() => {
-    if (state.chapterData.index < state.chapterData.words.length - 1 || currentWordExerciseCount < loopWordTimes - 1) {
+    // console.log('debug finish',state.chapterData.index , state.chapterData.words.length)
+    if (
+      state.chapterData.index < state.chapterData.words.length - 1 ||
+      currentWordExerciseCount < loopWordTimes - 1 ||
+      state.blockData.status == 0
+    ) {
       // 用户完成当前单词
+      // console.log(state.chapterData.index, state.blockData.index,state.chapterData.words.length,)
       if (currentWordExerciseCount < loopWordTimes - 1) {
         setCurrentWordExerciseCount((old) => old + 1)
         dispatch({ type: TypingStateActionType.LOOP_CURRENT_WORD })
         reloadCurrentWordComponent()
       } else {
         setCurrentWordExerciseCount(0)
-        dispatch({ type: TypingStateActionType.NEXT_WORD })
+        if (state.chapterData.index < state.chapterData.words.length - 1) {
+          dispatch({ type: TypingStateActionType.NEXT_WORD })
+        }
+        if (state.blockData.status < 2 && (state.blockData.index == 7 || state.chapterData.index == state.chapterData.words.length - 1)) {
+          if (state.blockData.status == 0) {
+            setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
+          } else if (state.blockData.status == 1) {
+            setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
+          }
+          dispatch({ type: TypingStateActionType.END_THIS_BLOCK })
+        }
       }
     } else {
       // 用户完成当前章节
-      dispatch({ type: TypingStateActionType.FINISH_CHAPTER })
+      // console.log('debug else',state.chapterData.index , state.chapterData.words.length)
+      if (state.blockData.status < 2) {
+        alert('即将开始单词测试')
+        dispatch({ type: TypingStateActionType.START_CHAPTER_TEST })
+      } else {
+        // todo
+        // state.blockData.testscore = 30;
+        let endchapter = true
+        if (state.blockData.testscore / state.chapterData.words.length < 0.9) {
+          const result = window.confirm('正确率（' + state.blockData.testscore / state.chapterData.words.length + '）不足 是否重新开始?')
+          if (result) {
+            dispatch({ type: TypingStateActionType.START_CHAPTER_TEST })
+            endchapter = false
+          }
+        }
+        if (endchapter) {
+          // console.log('debug finish chapter')
+          setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
+          dispatch({ type: TypingStateActionType.FINISH_CHAPTER })
+        }
+
+        // setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
+        // dispatch({ type: TypingStateActionType.FINISH_CHAPTER })
+      }
     }
   }, [
     state.chapterData.index,
@@ -88,6 +128,21 @@ export default function WordPanel() {
     (e) => {
       e.preventDefault()
       onSkipWord('next')
+    },
+    { preventDefault: true },
+  )
+
+  useHotkeys(
+    'ArrowRight',
+    (e) => {
+      if (state.blockData.status == 0 || state.blockData.status == 2) {
+        e.preventDefault()
+        // console.log('debug right key',state.blockData.index , state.blockData.blocksize)
+        // if (state.blockData.status == 0) {
+        //   setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
+        // }
+        onFinish()
+      }
     },
     { preventDefault: true },
   )

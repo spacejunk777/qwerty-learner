@@ -15,6 +15,14 @@ export const initialState: TypingState = {
     wordRecordIds: [],
     userInputLogs: [],
   },
+  blockData: {
+    index: 0,
+    status: 0,
+    reverseIndex: 0,
+    blocksize: 8,
+    words: [],
+    testscore: 0,
+  },
   timerData: {
     time: 0,
     accuracy: 0,
@@ -57,6 +65,9 @@ export enum TypingStateActionType {
   SET_IS_SAVING_RECORD = 'SET_IS_SAVING_RECORD',
   SET_IS_LOOP_SINGLE_WORD = 'SET_IS_LOOP_SINGLE_WORD',
   TOGGLE_IS_LOOP_SINGLE_WORD = 'TOGGLE_IS_LOOP_SINGLE_WORD',
+  END_THIS_BLOCK = 'END_THIS_BLOCK',
+  START_CHAPTER_TEST = 'START_CHAPTER_TEST',
+  RECORD_TEST_RESULT = 'RECORD_TEST_RESULT',
 }
 
 export type TypingStateAction =
@@ -79,6 +90,9 @@ export type TypingStateAction =
   | { type: TypingStateActionType.SET_IS_SAVING_RECORD; payload: boolean }
   | { type: TypingStateActionType.SET_IS_LOOP_SINGLE_WORD; payload: boolean }
   | { type: TypingStateActionType.TOGGLE_IS_LOOP_SINGLE_WORD }
+  | { type: TypingStateActionType.END_THIS_BLOCK }
+  | { type: TypingStateActionType.START_CHAPTER_TEST }
+  | { type: TypingStateActionType.RECORD_TEST_RESULT; payload: boolean }
 
 type Dispatch = (action: TypingStateAction) => void
 
@@ -116,6 +130,12 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
     }
     case TypingStateActionType.NEXT_WORD:
       state.chapterData.index += 1
+      if (state.blockData.status === 2) {
+        state.blockData.index = 0
+      } else {
+        state.blockData.index += 1
+      }
+      console.log('state.blockData.index', state.blockData.index)
       state.chapterData.wordCount += 1
       state.isShowSkip = false
       break
@@ -194,6 +214,44 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
     }
     case TypingStateActionType.TOGGLE_IS_LOOP_SINGLE_WORD: {
       state.isLoopSingleWord = !state.isLoopSingleWord
+      break
+    }
+    case TypingStateActionType.END_THIS_BLOCK: {
+      // console.log('reverseIndex',state.blockData.reverseIndex,state.chapterData.words.length - state.chapterData.index)
+
+      if (state.blockData.status === 0) {
+        state.chapterData.index = state.blockData.reverseIndex
+        state.blockData.status = 1
+
+        // state.blockData.reverseIndex = state.
+      } else {
+        state.blockData.status = 0
+        state.blockData.reverseIndex = state.chapterData.index
+        if (state.chapterData.words.length - state.chapterData.index < 8) {
+          state.blockData.blocksize = state.chapterData.words.length - state.chapterData.index
+        } else {
+          state.blockData.blocksize = 8
+        }
+      }
+      state.blockData.index = 0
+
+      // console.log('end this block')
+      break
+    }
+    case TypingStateActionType.START_CHAPTER_TEST: {
+      state.blockData.status = 2
+      state.blockData.testscore = 0
+      state.chapterData.index = 0
+      state.blockData.index = 0
+      state.chapterData.words = shuffle(state.chapterData.words)
+      break
+    }
+
+    case TypingStateActionType.RECORD_TEST_RESULT: {
+      if (!action.payload) {
+        state.blockData.testscore += 1
+      }
+      // console.log('record test result', action.payload, state.blockData.testscore)
       break
     }
     default: {

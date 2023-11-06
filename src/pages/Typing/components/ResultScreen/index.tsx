@@ -98,14 +98,7 @@ const ResultScreen = () => {
   }, [state.timerData.time])
 
   const repeatButtonHandler = useCallback(() => {
-    setWordDictationConfig((old) => {
-      if (old.isOpen) {
-        if (old.openBy === 'auto') {
-          return { ...old, isOpen: false }
-        }
-      }
-      return old
-    })
+    setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
     dispatch({ type: TypingStateActionType.REPEAT_CHAPTER, shouldShuffle: randomConfig.isOpen })
   }, [dispatch, randomConfig.isOpen, setWordDictationConfig])
 
@@ -131,6 +124,7 @@ const ResultScreen = () => {
   }, [dispatch, isLastChapter, setCurrentChapter, setWordDictationConfig])
 
   const exitButtonHandler = useCallback(() => {
+    setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
     dispatch({ type: TypingStateActionType.REPEAT_CHAPTER, shouldShuffle: false })
   }, [dispatch])
   useHotkeys(

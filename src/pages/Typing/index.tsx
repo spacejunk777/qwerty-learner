@@ -15,10 +15,11 @@ import StarCard from '@/components/StarCard'
 import Tooltip from '@/components/Tooltip'
 import { idDictionaryMap } from '@/resources/dictionary'
 import { currentChapterAtom, currentDictIdAtom, currentDictInfoAtom, randomConfigAtom } from '@/store'
+import { wordDictationConfigAtom } from '@/store'
 import { IsDesktop, isLegal } from '@/utils'
 import { useSaveChapterRecord } from '@/utils/db'
 import { useMixPanelChapterLogUploader } from '@/utils/mixpanel'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import type React from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
@@ -36,6 +37,7 @@ const App: React.FC = () => {
 
   const chapterLogUploader = useMixPanelChapterLogUploader(state)
   const saveChapterRecord = useSaveChapterRecord()
+  const setWordDictationConfig = useSetAtom(wordDictationConfigAtom)
 
   useEffect(() => {
     // 检测用户设备
@@ -95,6 +97,7 @@ const App: React.FC = () => {
         type: TypingStateActionType.SETUP_CHAPTER,
         payload: { words, shouldShuffle: randomConfig.isOpen },
       })
+      setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [words])

@@ -246,7 +246,7 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
   useEffect(() => {
     if (wordState.isFinished) {
       dispatch({ type: TypingStateActionType.SET_IS_SAVING_RECORD, payload: true })
-
+      dispatch({ type: TypingStateActionType.RECORD_TEST_RESULT, payload: wordState.wrongCount > 0 })
       wordLogUploader({
         headword: word.name,
         timeStart: wordState.startTime,

@@ -1,12 +1,14 @@
 import { TypingContext, TypingStateActionType } from '../../store'
 import Tooltip from '@/components/Tooltip'
-import { randomConfigAtom } from '@/store'
+import { randomConfigAtom, wordDictationConfigAtom } from '@/store'
 import { autoUpdate, offset, useFloating, useHover, useInteractions } from '@floating-ui/react'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useContext, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 
 export default function StartButton({ isLoading }: { isLoading: boolean }) {
+  const setWordDictationConfig = useSetAtom(wordDictationConfigAtom)
+
   // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
   const { state, dispatch } = useContext(TypingContext)!
   const randomConfig = useAtomValue(randomConfigAtom)
@@ -16,6 +18,7 @@ export default function StartButton({ isLoading }: { isLoading: boolean }) {
   }, [isLoading, dispatch])
 
   const onClickRestart = useCallback(() => {
+    setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
     dispatch({ type: TypingStateActionType.REPEAT_CHAPTER, shouldShuffle: randomConfig.isOpen })
   }, [dispatch, randomConfig.isOpen])
 
