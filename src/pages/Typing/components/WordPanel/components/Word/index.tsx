@@ -286,8 +286,8 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
 
   const addtoErrorBook = useCallback(() => {
     setWordState((state) => {
-      let inputLength = 1
-      let inputChar = '/'
+      const inputLength = 1
+      const inputChar = '/'
       state.letterStates[inputLength - 1] = 'wrong'
       state.hasWrong = true
       state.hasMadeInputWrong = true

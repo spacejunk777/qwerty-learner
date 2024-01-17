@@ -83,10 +83,13 @@ export default function WordPanel() {
             state.chapterData.index < state.chapterData.words.length - 1
           ) {
             // console.log('debug show translate')
-            showTranslateConfig.show = true
+            // showTranslateConfig.show = true;
             setTimeout(function () {
+              showTranslateConfig.show = true
+              console.log('s1')
               setTimeout(function () {
                 // console.log('point 2')
+                console.log('s2')
 
                 showTranslateConfig.show = false
                 if (
@@ -98,10 +101,11 @@ export default function WordPanel() {
                   showTranslateConfig.show = true
                 }
                 // console.log('point 3')
-                console.log('p1')
+                console.log('s3')
                 dispatch({ type: TypingStateActionType.NEXT_WORD })
               }, 1600)
             }, 1000)
+            console.log('s4')
           } else {
             console.log('p2')
             dispatch({ type: TypingStateActionType.NEXT_WORD })
