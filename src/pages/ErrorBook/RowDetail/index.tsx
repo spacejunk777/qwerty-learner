@@ -10,6 +10,8 @@ import { WordPronunciationIcon } from '@/components/WordPronunciationIcon'
 import Phonetic from '@/pages/Typing/components/WordPanel/components/Phonetic'
 import Letter from '@/pages/Typing/components/WordPanel/components/Word/Letter'
 import { idDictionaryMap } from '@/resources/dictionary'
+import { db } from '@/utils/db'
+import { assert } from 'console'
 import { useSetAtom } from 'jotai'
 import { useCallback, useMemo, useRef } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
@@ -65,6 +67,15 @@ const RowDetail: React.FC<RowDetailProps> = ({ currentRowDetail, allRecords }) =
     { enableOnFormTags: true, preventDefault: true },
   )
 
+  const deletewrongword = useCallback(() => {
+    console.log('delete wrong word', word)
+    const wordname = word?.name
+    db.wordRecords.filter((record) => record.wrongCount > 0 && record.word == wordname).modify({ wrongCount: 0 })
+    alert('已删除' + wordname + '的错误记录')
+
+    // })
+  }, [])
+
   return (
     <div className="absolute inset-0 flex  flex-col items-center  justify-center ">
       <div className="my-card relative z-10 flex h-[32rem] min-w-[26rem] select-text flex-col items-center justify-around rounded-2xl bg-white px-3 py-10 dark:bg-gray-900">
@@ -84,6 +95,11 @@ const RowDetail: React.FC<RowDetailProps> = ({ currentRowDetail, allRecords }) =
                 ref={wordPronunciationIconRef}
               />
             )}
+          </div>
+          <div className="button-container">
+            <button id="myButton" style={{ color: 'red' }} onClick={deletewrongword}>
+              删除
+            </button>
           </div>
           <div className="flex max-w-[24rem] items-center">
             <span className={`max-w-4xl text-center font-sans transition-colors duration-300 dark:text-white dark:text-opacity-80`}>

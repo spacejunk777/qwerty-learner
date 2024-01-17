@@ -85,21 +85,23 @@ export default function WordPanel() {
             // console.log('debug show translate')
             showTranslateConfig.show = true
             setTimeout(function () {
-              // console.log('point 2')
+              setTimeout(function () {
+                // console.log('point 2')
 
-              showTranslateConfig.show = false
-              if (
-                state.blockData.status == 1 &&
-                state.blockData.index == 7 &&
-                state.chapterData.index < state.chapterData.words.length - 1
-              ) {
-                // console.log('point 2 1')
-                showTranslateConfig.show = true
-              }
-              // console.log('point 3')
-              console.log('p1')
-              dispatch({ type: TypingStateActionType.NEXT_WORD })
-            }, 1600)
+                showTranslateConfig.show = false
+                if (
+                  state.blockData.status == 1 &&
+                  state.blockData.index == 7 &&
+                  state.chapterData.index < state.chapterData.words.length - 1
+                ) {
+                  // console.log('point 2 1')
+                  showTranslateConfig.show = true
+                }
+                // console.log('point 3')
+                console.log('p1')
+                dispatch({ type: TypingStateActionType.NEXT_WORD })
+              }, 1600)
+            }, 1000)
           } else {
             console.log('p2')
             dispatch({ type: TypingStateActionType.NEXT_WORD })
