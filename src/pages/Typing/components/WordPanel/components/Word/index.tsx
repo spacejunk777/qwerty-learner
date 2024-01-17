@@ -286,8 +286,8 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
 
   const addtoErrorBook = useCallback(() => {
     setWordState((state) => {
-      const inputLength = 1
-      const inputChar = '/'
+      let inputLength = 1
+      let inputChar = '/'
       state.letterStates[inputLength - 1] = 'wrong'
       state.hasWrong = true
       state.hasMadeInputWrong = true
@@ -341,7 +341,7 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
             />
           )}
         </div>
-        <button className="my-btn-primary fixed bottom-80 right-80" onClick={addtoErrorBook}>
+        <button className="my-btn-primary bottom-50 fixed right-80" onClick={addtoErrorBook}>
           加入错题本
         </button>
       </div>

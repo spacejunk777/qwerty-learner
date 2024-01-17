@@ -13,6 +13,9 @@ import {
   showTranslateConfigAtom,
 } from '@/store'
 import type { Word } from '@/typings'
+import shuffle from '@/utils/shuffle'
+import { on } from 'events'
+import { stat } from 'fs'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import React, { useEffect } from 'react'
@@ -139,7 +142,7 @@ export default function WordPanel() {
       //   showTranslateConfig.show = false;
       // } else {
       showTranslateConfig.show = true
-
+      console.log('debug finish chapter')
       // }
       if (state.blockData.status < 2) {
         alert('即将开始单词测试')
@@ -221,6 +224,24 @@ export default function WordPanel() {
     { preventDefault: true },
   )
 
+  const beginTest = useCallback(() => {
+    alert('即将开始单词测试')
+    dispatch({ type: TypingStateActionType.START_CHAPTER_TEST })
+    setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
+    // state.blockData.status = 1;
+    // state.chapterData.index = state.chapterData.words.length - 1;
+    // state.blockData.index = state.chapterData.words.length % 8;
+    // setCurrentWordExerciseCount(loopWordTimes - 1)
+    // onFinish();
+  }, [
+    state.chapterData.index,
+    state.chapterData.words.length,
+    currentWordExerciseCount,
+    loopWordTimes,
+    dispatch,
+    reloadCurrentWordComponent,
+  ])
+
   return (
     <div className="container flex h-full w-full flex-col items-center justify-center">
       <div className="container flex h-24 w-full shrink-0 grow-0 justify-between px-12 pt-10">
@@ -251,6 +272,9 @@ export default function WordPanel() {
           </div>
         )}
       </div>
+      <button className="my-btn-primary bottom-50 fixed right-80" onClick={beginTest}>
+        开始测试
+      </button>
       <Progress className={`mb-10 mt-auto ${state.isTyping ? 'opacity-100' : 'opacity-0'}`} />
     </div>
   )
