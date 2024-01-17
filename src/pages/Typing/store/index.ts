@@ -129,13 +129,17 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
       break
     }
     case TypingStateActionType.NEXT_WORD:
+      console.log('next word', state.blockData.status)
+      if (state.chapterData.index == -1) {
+        state.chapterData.index = 0
+      }
       state.chapterData.index += 1
       if (state.blockData.status === 2) {
         state.blockData.index = 0
       } else {
         state.blockData.index += 1
       }
-      console.log('state.blockData.index', state.blockData.index)
+      // console.log('state.blockData.index',state.blockData.index)
       state.chapterData.wordCount += 1
       state.isShowSkip = false
       break
@@ -218,22 +222,24 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
     }
     case TypingStateActionType.END_THIS_BLOCK: {
       // console.log('reverseIndex',state.blockData.reverseIndex,state.chapterData.words.length - state.chapterData.index)
-
+      console.log('end this block', state.blockData.status)
       if (state.blockData.status === 0) {
         state.chapterData.index = state.blockData.reverseIndex
         state.blockData.status = 1
+        state.blockData.index = 0
 
         // state.blockData.reverseIndex = state.
       } else {
         state.blockData.status = 0
-        state.blockData.reverseIndex = state.chapterData.index
+        state.blockData.reverseIndex = state.chapterData.index + 1
         if (state.chapterData.words.length - state.chapterData.index < 8) {
           state.blockData.blocksize = state.chapterData.words.length - state.chapterData.index
         } else {
           state.blockData.blocksize = 8
         }
+        state.blockData.index = -1
       }
-      state.blockData.index = 0
+      // state.blockData.index = 0
 
       // console.log('end this block')
       break

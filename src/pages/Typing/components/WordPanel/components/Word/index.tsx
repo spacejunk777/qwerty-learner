@@ -127,6 +127,17 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
     { enableOnFormTags: true, preventDefault: true },
   )
 
+  useHotkeys(
+    'ctrl+a',
+    () => {
+      wordState.hasWrong = true
+      wordState.hasMadeInputWrong = true
+      wordState.wrongCount += 1
+      alert('你已经将单词加入错题本')
+    },
+    { enableOnFormTags: true, preventDefault: true },
+  )
+
   useEffect(() => {
     if (wordState.inputWord.length === 0 && state.isTyping) {
       wordPronunciationIconRef.current?.play && wordPronunciationIconRef.current?.play()
@@ -273,6 +284,32 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
     }
   }, [wordState.wrongCount, dispatch])
 
+  const addtoErrorBook = useCallback(() => {
+    setWordState((state) => {
+      let inputLength = 1
+      let inputChar = '/'
+      state.letterStates[inputLength - 1] = 'wrong'
+      state.hasWrong = true
+      state.hasMadeInputWrong = true
+      state.wrongCount += 1
+      state.letterTimeArray = []
+      state.isFinished = true
+
+      if (state.letterMistake[inputLength - 1]) {
+        state.letterMistake[inputLength - 1].push(inputChar)
+      } else {
+        state.letterMistake[inputLength - 1] = [inputChar]
+      }
+
+      const currentState = JSON.parse(JSON.stringify(state))
+      dispatch({ type: TypingStateActionType.REPORT_WRONG_WORD, payload: { letterMistake: currentState.letterMistake } })
+    })
+    // wordState.isFinished = true
+    if (currentChapter === 0 && state.chapterData.index === 0 && wordState.wrongCount >= 3) {
+      setShowTipAlert(true)
+    }
+  }, [])
+
   return (
     <>
       <InputHandler updateInput={updateInput} />
@@ -304,6 +341,9 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
             />
           )}
         </div>
+        <button className="my-btn-primary fixed bottom-80 right-80" onClick={addtoErrorBook}>
+          加入错题本
+        </button>
       </div>
       <TipAlert className="fixed bottom-10 right-3" show={showTipAlert} setShow={setShowTipAlert} />
     </>

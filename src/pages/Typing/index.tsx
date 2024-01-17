@@ -39,6 +39,17 @@ const App: React.FC = () => {
   const saveChapterRecord = useSaveChapterRecord()
   const setWordDictationConfig = useSetAtom(wordDictationConfigAtom)
 
+  // useEffect(() => {
+  //   // 检测用户设备
+  //   if (!IsDesktop()) {
+  //     setTimeout(() => {
+  //       alert(
+  //         ' alert'
+  //       )
+  //     }, 500)
+  //   }
+  // }, [])
+
   useEffect(() => {
     // 检测用户设备
     if (!IsDesktop()) {

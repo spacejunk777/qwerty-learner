@@ -1,7 +1,7 @@
 import Tooltip from '@/components/Tooltip'
 import { SoundIcon } from '@/components/WordPronunciationIcon/SoundIcon'
 import useSpeech from '@/hooks/useSpeech'
-import { fontSizeConfigAtom, isTextSelectableAtom, pronunciationConfigAtom } from '@/store'
+import { fontSizeConfigAtom, isTextSelectableAtom, pronunciationConfigAtom, showTranslateConfigAtom } from '@/store'
 import { useAtomValue } from 'jotai'
 import { useCallback, useMemo } from 'react'
 
@@ -11,6 +11,7 @@ export type TranslationProps = {
 
 export default function Translation({ trans }: TranslationProps) {
   const pronunciationConfig = useAtomValue(pronunciationConfigAtom)
+  const showTranslateConfig = useAtomValue(showTranslateConfigAtom)
   const fontSizeConfig = useAtomValue(fontSizeConfigAtom)
   const isShowTransRead = window.speechSynthesis && pronunciationConfig.isTransRead
   const speechOptions = useMemo(() => ({ volume: pronunciationConfig.transVolume }), [pronunciationConfig.transVolume])
@@ -22,12 +23,12 @@ export default function Translation({ trans }: TranslationProps) {
 
   const isTextSelectable = useAtomValue(isTextSelectableAtom)
   return (
-    <div className={`flex items-center justify-center  pb-4 pt-5`}>
+    <div className={`flex items-center justify-center  pb-4 pt-5`} id="translate_text">
       <span
         className={`max-w-4xl text-center font-sans transition-colors duration-300 dark:text-white dark:text-opacity-80 ${
           isShowTransRead && 'pl-8'
         } ${isTextSelectable && 'select-text'}`}
-        style={{ fontSize: fontSizeConfig.translateFont.toString() + 'px' }}
+        style={{ fontSize: fontSizeConfig.translateFont.toString() + 'px', visibility: showTranslateConfig.show ? 'visible' : 'hidden' }}
       >
         {trans}
       </span>

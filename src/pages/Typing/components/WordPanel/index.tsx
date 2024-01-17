@@ -5,10 +5,17 @@ import Phonetic from './components/Phonetic'
 import Translation from './components/Translation'
 import WordComponent from './components/Word'
 import { usePrefetchPronunciationSound } from '@/hooks/usePronunciation'
-import { isShowPrevAndNextWordAtom, loopWordConfigAtom, phoneticConfigAtom, wordDictationConfigAtom } from '@/store'
+import {
+  isShowPrevAndNextWordAtom,
+  loopWordConfigAtom,
+  phoneticConfigAtom,
+  wordDictationConfigAtom,
+  showTranslateConfigAtom,
+} from '@/store'
 import type { Word } from '@/typings'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 
 export default function WordPanel() {
@@ -22,6 +29,7 @@ export default function WordPanel() {
   const currentWord = state.chapterData.words[state.chapterData.index]
   const nextWord = state.chapterData.words[state.chapterData.index + 1] as Word | undefined
   const setWordDictationConfig = useSetAtom(wordDictationConfigAtom)
+  const showTranslateConfig = useAtomValue(showTranslateConfigAtom)
 
   const prevIndex = useMemo(() => {
     const newIndex = state.chapterData.index - 1
@@ -39,28 +47,81 @@ export default function WordPanel() {
   }, [])
 
   const onFinish = useCallback(() => {
-    // console.log('debug finish',state.chapterData.index , state.chapterData.words.length)
+    console.log('debug finish', state.chapterData.index, state.chapterData.words.length)
+    let translate_text = document.getElementById('translate_text')
     if (
       state.chapterData.index < state.chapterData.words.length - 1 ||
       currentWordExerciseCount < loopWordTimes - 1 ||
       state.blockData.status == 0
     ) {
+      // not done this chapter yet
       // 用户完成当前单词
-      // console.log(state.chapterData.index, state.blockData.index,state.chapterData.words.length,)
+      console.log(state.chapterData.index, state.blockData.status, state.blockData.index)
+
       if (currentWordExerciseCount < loopWordTimes - 1) {
+        console.log('debug loop')
         setCurrentWordExerciseCount((old) => old + 1)
         dispatch({ type: TypingStateActionType.LOOP_CURRENT_WORD })
         reloadCurrentWordComponent()
       } else {
+        // done this word
+        console.log('debug else')
         setCurrentWordExerciseCount(0)
+        // console.log(state.blockData.index,state.blockData.blocksize);
+        if (state.blockData.status == 0 && state.chapterData.index < state.chapterData.words.length - 1) {
+          showTranslateConfig.show = true
+        } else {
+          // console.log('point 1')
+          showTranslateConfig.show = false
+        }
+
         if (state.chapterData.index < state.chapterData.words.length - 1) {
+          //
+
+          if (
+            (state.blockData.status == 1 || state.blockData.status == 2) &&
+            state.chapterData.index < state.chapterData.words.length - 1
+          ) {
+            // console.log('debug show translate')
+            showTranslateConfig.show = true
+            setTimeout(function () {
+              // console.log('point 2')
+
+              showTranslateConfig.show = false
+              if (
+                state.blockData.status == 1 &&
+                state.blockData.index == 7 &&
+                state.chapterData.index < state.chapterData.words.length - 1
+              ) {
+                // console.log('point 2 1')
+                showTranslateConfig.show = true
+              }
+              // console.log('point 3')
+              console.log('p1')
+              dispatch({ type: TypingStateActionType.NEXT_WORD })
+            }, 1600)
+          } else {
+            console.log('p2')
+            dispatch({ type: TypingStateActionType.NEXT_WORD })
+            // console.log('debug bad status')
+          }
+        } else {
+          console.log('p3')
           dispatch({ type: TypingStateActionType.NEXT_WORD })
         }
+        // dispatch({ type: TypingStateActionType.NEXT_WORD })
+        console.log('end p')
         if (state.blockData.status < 2 && (state.blockData.index == 7 || state.chapterData.index == state.chapterData.words.length - 1)) {
+          // done this block
+          // console.log(state.blockData.index,state.blockData.blocksize);
           if (state.blockData.status == 0) {
+            // show word
             setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
+            showTranslateConfig.show = false
           } else if (state.blockData.status == 1) {
+            // dont show word
             setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
+            showTranslateConfig.show = true
           }
           dispatch({ type: TypingStateActionType.END_THIS_BLOCK })
         }
@@ -68,8 +129,15 @@ export default function WordPanel() {
     } else {
       // 用户完成当前章节
       // console.log('debug else',state.chapterData.index , state.chapterData.words.length)
+      // if (state.blockData.status == 0 || state.blockData.status == 1) {
+      //   showTranslateConfig.show = false;
+      // } else {
+      showTranslateConfig.show = true
+
+      // }
       if (state.blockData.status < 2) {
         alert('即将开始单词测试')
+        showTranslateConfig.show = false
         dispatch({ type: TypingStateActionType.START_CHAPTER_TEST })
       } else {
         // todo
@@ -135,14 +203,14 @@ export default function WordPanel() {
   useHotkeys(
     'ArrowRight',
     (e) => {
-      if (state.blockData.status == 0 || state.blockData.status == 2) {
-        e.preventDefault()
-        // console.log('debug right key',state.blockData.index , state.blockData.blocksize)
-        // if (state.blockData.status == 0) {
-        //   setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
-        // }
-        onFinish()
-      }
+      // if (state.blockData.status == 0 || state.blockData.status == 2) {
+      e.preventDefault()
+      // console.log('debug right key',state.blockData.index , state.blockData.blocksize)
+      // if (state.blockData.status == 0) {
+      //   setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
+      // }
+      onFinish()
+      // }
     },
     { preventDefault: true },
   )
