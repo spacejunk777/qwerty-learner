@@ -75,25 +75,36 @@ export default function WordPanel() {
               && state.chapterData.index < state.chapterData.words.length - 1) {
               // console.log('debug show translate')
               // showTranslateConfig.show = true;
-              setTimeout(function() {
+              let timeoutid;
+              timeoutid = setTimeout(function() {
+                  timeoutid = null;
+                  dispatch({ type: TypingStateActionType.SET_TIMEOUT_ID, payload: timeoutid })
+
                   showTranslateConfig.show = true;
                   console.log('s1')
-                  setTimeout(function() {
-                  // console.log('point 2')
-                  console.log('s2')
+                  timeoutid = setTimeout(function() {
+                    timeoutid = null;
+                    dispatch({ type: TypingStateActionType.SET_TIMEOUT_ID, payload: timeoutid })
+                    // console.log('point 2')
+                    console.log('s2')
 
-                  showTranslateConfig.show = false;
-                  if (state.blockData.status == 1 && state.blockData.index == 7 && state.chapterData.index < state.chapterData.words.length - 1) {
-                    // console.log('point 2 1')
-                    showTranslateConfig.show = true;
-                  }
-                  // console.log('point 3')
-                  console.log('s3')
-                  dispatch({ type: TypingStateActionType.NEXT_WORD })
+                    showTranslateConfig.show = false;
+                    if (state.blockData.status == 1 && state.blockData.index == 7 && state.chapterData.index < state.chapterData.words.length - 1) {
+                      // console.log('point 2 1')
+                      showTranslateConfig.show = true;
+                    }
+                    // console.log('point 3')
+                    console.log('s3')
+         
 
+                    dispatch({ type: TypingStateActionType.NEXT_WORD })
+
+                    
 
                   }, 1600);   
-              }, 1000);      
+                  dispatch({ type: TypingStateActionType.SET_TIMEOUT_ID, payload: timeoutid })
+              }, 1000);
+              dispatch({ type: TypingStateActionType.SET_TIMEOUT_ID, payload: timeoutid })      
               console.log('s4')     
             } else {
               console.log('p2')

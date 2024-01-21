@@ -27,6 +27,7 @@ export type BlockData = {
   status: number
   blocksize: number
   testscore: number
+  timeoutid: NodeJS.Timeout | null
 }
 
 export type UserInputLog = {

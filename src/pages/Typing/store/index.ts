@@ -4,6 +4,8 @@ import type { LetterMistakes } from '@/utils/db/record'
 import { mergeLetterMistake } from '@/utils/db/utils'
 import shuffle from '@/utils/shuffle'
 import { createContext } from 'react'
+import { showTranslateConfigAtom} from '@/store'
+import { useAtomValue, useSetAtom } from 'jotai'
 
 export const initialState: TypingState = {
   chapterData: {
@@ -22,6 +24,7 @@ export const initialState: TypingState = {
     blocksize: 8,
     words: [],
     testscore: 0,
+    timeoutid: null,
   },
   timerData: {
     time: 0,
@@ -68,6 +71,7 @@ export enum TypingStateActionType {
   END_THIS_BLOCK = 'END_THIS_BLOCK',
   START_CHAPTER_TEST = 'START_CHAPTER_TEST',
   RECORD_TEST_RESULT = 'RECORD_TEST_RESULT',
+  SET_TIMEOUT_ID = 'SET_TIMEOUT_ID',
 }
 
 export type TypingStateAction =
@@ -93,10 +97,13 @@ export type TypingStateAction =
   | { type: TypingStateActionType.END_THIS_BLOCK }
   | { type: TypingStateActionType.START_CHAPTER_TEST }
   | { type: TypingStateActionType.RECORD_TEST_RESULT; payload: boolean }
+  | { type: TypingStateActionType.SET_TIMEOUT_ID; payload: NodeJS.Timeout | null }
 
 type Dispatch = (action: TypingStateAction) => void
+// const showTranslateConfig = useAtomValue(showTranslateConfigAtom)
 
 export const typingReducer = (state: TypingState, action: TypingStateAction) => {
+
   switch (action.type) {
     case TypingStateActionType.SETUP_CHAPTER:
       state.chapterData.words = action.payload.shouldShuffle ? shuffle(action.payload.words) : action.payload.words
@@ -167,6 +174,14 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
     }
     case TypingStateActionType.SKIP_2_WORD_INDEX: {
       console.log('skip 2 word')
+      if (state.blockData.timeoutid) {
+        console.log('clear timeout')
+        clearTimeout(state.blockData.timeoutid)
+      }
+      // if (state.blockData.status === 2 || state.blockData.status === 1) {
+      //   let showTranslateConfig = useAtomValue(showTranslateConfigAtom)
+      //   showTranslateConfig.show = false
+      // }
       const newIndex = action.newIndex
       if (newIndex >= state.chapterData.words.length) {
         state.isTyping = false
@@ -253,6 +268,7 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
       state.chapterData.index = 0;
       state.blockData.index = 0;
       state.chapterData.words = shuffle(state.chapterData.words);
+      state.blockData.timeoutid = null;
       break
     }
 
@@ -261,6 +277,10 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
         state.blockData.testscore += 1;
       }
       // console.log('record test result', action.payload, state.blockData.testscore)
+      break
+    }
+    case TypingStateActionType.SET_TIMEOUT_ID: {
+      state.blockData.timeoutid = action.payload;
       break
     }
     default: {
