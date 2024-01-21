@@ -6,6 +6,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useContext, useState } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 
+
 export default function StartButton({ isLoading }: { isLoading: boolean }) {
   const setWordDictationConfig = useSetAtom(wordDictationConfigAtom)
 

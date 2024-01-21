@@ -10,8 +10,6 @@ import { WordPronunciationIcon } from '@/components/WordPronunciationIcon'
 import Phonetic from '@/pages/Typing/components/WordPanel/components/Phonetic'
 import Letter from '@/pages/Typing/components/WordPanel/components/Word/Letter'
 import { idDictionaryMap } from '@/resources/dictionary'
-import { db } from '@/utils/db'
-import { assert } from 'console'
 import { useSetAtom } from 'jotai'
 import { useCallback, useMemo, useRef } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
@@ -20,6 +18,8 @@ import CheckCircle from '~icons/heroicons/check-circle-20-solid'
 import ClockIcon from '~icons/heroicons/clock-20-solid'
 import XCircle from '~icons/heroicons/x-circle-20-solid'
 import IconX from '~icons/tabler/x'
+import { db } from '@/utils/db'
+import { assert } from 'console'
 
 type RowDetailProps = {
   currentRowDetail: groupedWordRecords
@@ -68,13 +68,16 @@ const RowDetail: React.FC<RowDetailProps> = ({ currentRowDetail, allRecords }) =
   )
 
   const deletewrongword = useCallback(() => {
-    console.log('delete wrong word', word)
+    console.log("delete wrong word", word)
     const wordname = word?.name
-    db.wordRecords.filter((record) => record.wrongCount > 0 && record.word == wordname).modify({ wrongCount: 0 })
-    alert('已删除' + wordname + '的错误记录')
-
-    // })
-  }, [])
+    db.wordRecords
+      .filter((record) => record.wrongCount > 0 && record.word == wordname)
+      .modify({ wrongCount: 0 })
+    alert("已删除"+wordname+"的错误记录")
+    
+      // })
+  }
+  , [])
 
   return (
     <div className="absolute inset-0 flex  flex-col items-center  justify-center ">
@@ -97,9 +100,7 @@ const RowDetail: React.FC<RowDetailProps> = ({ currentRowDetail, allRecords }) =
             )}
           </div>
           <div className="button-container">
-            <button id="myButton" style={{ color: 'red' }} onClick={deletewrongword}>
-              删除
-            </button>
+            <button id="myButton" style={{ color: 'red' }} onClick={deletewrongword}>删除</button>
           </div>
           <div className="flex max-w-[24rem] items-center">
             <span className={`max-w-4xl text-center font-sans transition-colors duration-300 dark:text-white dark:text-opacity-80`}>

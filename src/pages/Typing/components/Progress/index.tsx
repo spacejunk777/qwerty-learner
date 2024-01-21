@@ -29,12 +29,13 @@ export default function Progress({ className }: { className?: string }) {
 
   useEffect(() => {
     const newProgress = Math.floor(
-      ((state.chapterData.index - state.blockData.index * (1 - state.blockData.status)) / state.chapterData.words.length) * 100,
-    )
+        ((state.chapterData.index-state.blockData.index*(1-state.blockData.status)) 
+          / state.chapterData.words.length) * 100)
     setProgress(newProgress)
     const colorPhase = Math.floor(newProgress / 33.4)
     setPhase(colorPhase)
   }, [state.chapterData.index, state.chapterData.words.length])
+
 
   useEffect(() => {
     // console.log('debug2',state.blockData.index , state.blockData.blocksize)
@@ -43,6 +44,7 @@ export default function Progress({ className }: { className?: string }) {
     const colorPhase = Math.floor(newProgress / 33.4)
     setPhaseb(colorPhase)
   }, [state.blockData.index])
+
 
   return (
     <div className={`relative w-1/4 pt-1 ${className}`}>
@@ -56,22 +58,31 @@ export default function Progress({ className }: { className?: string }) {
       </div>
       <div className="mb-4 flex h-2 overflow-hidden rounded-xl bg-indigo-100 text-xs transition-all duration-300 dark:bg-indigo-200">
         <div
-          style={{ width: `${(1 - state.blockData.status) * progressb}%` }}
+          style={{ width: `${(1-state.blockData.status)*progressb}%` }}
           className={`flex flex-col justify-center whitespace-nowrap rounded-xl text-center text-white shadow-none transition-all duration-300 ${
             colorSwitcherb[phaseb] ?? 'bg-indigo-250 dark:bg-indigo-350'
           }`}
         ></div>
         <div
-          style={{ width: `${state.blockData.status * progressb}%` }}
+          style={{ width: `${(state.blockData.status)*progressb}%` }}
           className={`flex flex-col justify-center whitespace-nowrap rounded-xl text-center text-white shadow-none transition-all duration-300 ${
             colorSwitcherb_s2[phaseb] ?? 'bg-indigo-250 dark:bg-indigo-350'
           }`}
         ></div>
       </div>
 
-      <div style={{ textAlign: 'center' }}>{state.blockData.status == 0 && '学习模式：按右键下一个'}</div>
-      <div style={{ textAlign: 'center' }}>{state.blockData.status == 1 && '练习模式'}</div>
-      <div style={{ textAlign: 'center' }}>{state.blockData.status == 2 && '测试模式: 按右键放弃'}</div>
+
+      <div style={{ textAlign: 'center' }} >
+      { state.blockData.status == 0 && "学习模式：按右键下一个" }
+      </div>
+      <div style={{ textAlign: 'center' }} >
+      { state.blockData.status == 1 && "练习模式" }
+      </div>
+      <div style={{ textAlign: 'center' }} >
+      { state.blockData.status == 2 && "测试模式: 按右键放弃" }
+      </div>
     </div>
   )
 }
+
+

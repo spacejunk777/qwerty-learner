@@ -101,7 +101,7 @@ export const wordDictationConfigAtom = atomForConfig('wordDictationConfig', {
 })
 
 export const showTranslateConfigAtom = atomForConfig('showTranslateConfig', {
-  show: true,
+ show: true,
 })
 
 export const dismissStartCardDateAtom = atomWithStorage<Date | null>(DISMISS_START_CARD_DATE_KEY, null)

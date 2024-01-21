@@ -126,7 +126,7 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
     [state.isTyping],
     { enableOnFormTags: true, preventDefault: true },
   )
-
+  
   useHotkeys(
     'ctrl+a',
     () => {
@@ -136,7 +136,9 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
       alert('你已经将单词加入错题本')
     },
     { enableOnFormTags: true, preventDefault: true },
+    
   )
+
 
   useEffect(() => {
     if (wordState.inputWord.length === 0 && state.isTyping) {
@@ -308,7 +310,8 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
     if (currentChapter === 0 && state.chapterData.index === 0 && wordState.wrongCount >= 3) {
       setShowTipAlert(true)
     }
-  }, [])
+  }
+  , [])
 
   return (
     <>
@@ -341,7 +344,7 @@ export default function WordComponent({ word, onFinish }: { word: Word; onFinish
             />
           )}
         </div>
-        <button className="my-btn-primary bottom-50 fixed right-80" onClick={addtoErrorBook}>
+        <button className="my-btn-primary fixed bottom-50 right-80" onClick={addtoErrorBook} >
           加入错题本
         </button>
       </div>
