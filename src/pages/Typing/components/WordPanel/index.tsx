@@ -66,11 +66,10 @@ export default function WordPanel() {
         } else {
             // console.log('point 1')
             showTranslateConfig.show = false;
-          
         }
 
         if (state.chapterData.index < state.chapterData.words.length - 1) { // 
-
+            console.log('debug1 ', state.blockData.status, state.chapterData.index)
             if ((state.blockData.status == 1 || state.blockData.status == 2) 
               && state.chapterData.index < state.chapterData.words.length - 1) {
               // console.log('debug show translate')
@@ -95,8 +94,6 @@ export default function WordPanel() {
                     }
                     // console.log('point 3')
                     console.log('s3')
-         
-
                     dispatch({ type: TypingStateActionType.NEXT_WORD })
 
                     
@@ -229,7 +226,14 @@ export default function WordPanel() {
         // if (state.blockData.status == 0) {
         //   setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
         // }
-        onFinish()
+        if (state.blockData.timeoutid) {
+          clearTimeout(state.blockData.timeoutid);
+          dispatch({ type: TypingStateActionType.SET_TIMEOUT_ID, payload: null })
+          onSkipWord('next')
+        } else{
+          onFinish()
+
+        }
       // }
     },
     { preventDefault: true },
@@ -237,17 +241,15 @@ export default function WordPanel() {
 
 
   const beginTest = useCallback(() => {
-          alert('即将开始单词测试')
-          showTranslateConfig.show = false;
-          dispatch({ type: TypingStateActionType.START_CHAPTER_TEST })
-          setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
+        alert('即将开始单词测试')
+        showTranslateConfig.show = false;
+        setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
+        dispatch({ type: TypingStateActionType.START_CHAPTER_TEST })
+        // console.log('debug tmp', state)
   }, [
     state.chapterData.index,
     state.chapterData.words.length,
-    currentWordExerciseCount,
-    loopWordTimes,
     dispatch,
-    reloadCurrentWordComponent,
   ])
 
   return (

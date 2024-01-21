@@ -177,6 +177,7 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
       if (state.blockData.timeoutid) {
         console.log('clear timeout')
         clearTimeout(state.blockData.timeoutid)
+        state.blockData.timeoutid = null
       }
       // if (state.blockData.status === 2 || state.blockData.status === 1) {
       //   let showTranslateConfig = useAtomValue(showTranslateConfigAtom)
@@ -263,12 +264,14 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
       break
     }
     case TypingStateActionType.START_CHAPTER_TEST: {
+      console.log('start chapter test')
       state.blockData.status = 2;
       state.blockData.testscore = 0;
       state.chapterData.index = 0;
       state.blockData.index = 0;
       state.chapterData.words = shuffle(state.chapterData.words);
       state.blockData.timeoutid = null;
+
       break
     }
 
@@ -281,6 +284,7 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
     }
     case TypingStateActionType.SET_TIMEOUT_ID: {
       state.blockData.timeoutid = action.payload;
+      console.log('set timeout id', state.blockData.timeoutid)
       break
     }
     default: {
