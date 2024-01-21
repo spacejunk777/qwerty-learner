@@ -190,6 +190,7 @@ export default function WordPanel() {
 
   const onSkipWord = useCallback(
     (type: 'prev' | 'next') => {
+      console.log('debug skip word call back')
       if (type === 'prev') {
         dispatch({ type: TypingStateActionType.SKIP_2_WORD_INDEX, newIndex: prevIndex })
       }

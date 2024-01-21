@@ -6,10 +6,13 @@ import { useAtomValue } from 'jotai'
 import { useCallback, useContext, useMemo } from 'react'
 import IconPrev from '~icons/tabler/arrow-narrow-left'
 import IconNext from '~icons/tabler/arrow-narrow-right'
+import { showTranslateConfigAtom} from '@/store'
 
 export default function PrevAndNextWord({ type }: LastAndNextWordProps) {
   // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
   const { state, dispatch } = useContext(TypingContext)!
+  const showTranslateConfig = useAtomValue(showTranslateConfigAtom)
+
 
   const wordDictationConfig = useAtomValue(wordDictationConfigAtom)
   const newIndex = useMemo(() => state.chapterData.index + (type === 'prev' ? -1 : 1), [state.chapterData.index, type])
@@ -20,7 +23,12 @@ export default function PrevAndNextWord({ type }: LastAndNextWordProps) {
     if (!word) return
 
     if (type === 'prev') dispatch({ type: TypingStateActionType.SKIP_2_WORD_INDEX, newIndex })
-    if (type === 'next') dispatch({ type: TypingStateActionType.SKIP_2_WORD_INDEX, newIndex })
+    if (type === 'next') {
+      dispatch({ type: TypingStateActionType.SKIP_2_WORD_INDEX, newIndex })
+      if (state.blockData.status == 1 || state.blockData.status == 2) {
+        showTranslateConfig.show = false
+      }
+    }
   }, [type, dispatch, newIndex, word])
 
   const headWord = useMemo(() => {
