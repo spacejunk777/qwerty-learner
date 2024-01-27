@@ -255,7 +255,7 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
         } else {
           state.blockData.blocksize = 8;
         }
-        state.blockData.index = -1
+        state.blockData.index = 0
 
       }
       // state.blockData.index = 0

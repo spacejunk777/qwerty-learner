@@ -51,7 +51,7 @@ export default function WordPanel() {
       || state.blockData.status == 0) { // not done this chapter yet
       // 用户完成当前单词
       console.log(state.chapterData.index, state.blockData.status, state.blockData.index)
-      
+      var originidx = state.chapterData.index;
       if (currentWordExerciseCount < loopWordTimes - 1) {
         console.log('debug loop')
         setCurrentWordExerciseCount((old) => old + 1)
@@ -76,12 +76,14 @@ export default function WordPanel() {
               // showTranslateConfig.show = true;
               let timeoutid;
               timeoutid = setTimeout(function() {
+                  console.log('debug timeout 1')
                   timeoutid = null;
                   dispatch({ type: TypingStateActionType.SET_TIMEOUT_ID, payload: timeoutid })
 
                   showTranslateConfig.show = true;
                   console.log('s1')
                   timeoutid = setTimeout(function() {
+                    console.log('debug timeout 2')
                     timeoutid = null;
                     dispatch({ type: TypingStateActionType.SET_TIMEOUT_ID, payload: timeoutid })
                     // console.log('point 2')
@@ -96,7 +98,9 @@ export default function WordPanel() {
                     console.log('s3')
                     dispatch({ type: TypingStateActionType.NEXT_WORD })
 
-                    
+                    tryendblk();
+
+
 
                   }, 1600);   
                   dispatch({ type: TypingStateActionType.SET_TIMEOUT_ID, payload: timeoutid })
@@ -106,27 +110,37 @@ export default function WordPanel() {
             } else {
               console.log('p2')
               dispatch({ type: TypingStateActionType.NEXT_WORD })
-              // console.log('debug bad status')
+              tryendblk();
+                    // console.log('debug bad status')
             }
 
         } else {
           console.log('p3')
           dispatch({ type: TypingStateActionType.NEXT_WORD })
+          tryendblk();
         }
+
+
+
+
         // dispatch({ type: TypingStateActionType.NEXT_WORD })
         console.log('end p')
-        if (state.blockData.status < 2 && (state.blockData.index == 7 || 
-              (state.chapterData.index == state.chapterData.words.length - 1))) { // done this block
-          // console.log(state.blockData.index,state.blockData.blocksize);
-          if (state.blockData.status == 0) { // show word
-            setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
-            showTranslateConfig.show = false;
-          } else if (state.blockData.status == 1) { // dont show word
-            setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
-            showTranslateConfig.show = true;
-          }
-          dispatch({ type: TypingStateActionType.END_THIS_BLOCK })
-        }
+        // if (state.blockData.status < 2 && (state.blockData.index == 7 || 
+        //       (state.chapterData.index == state.chapterData.words.length - 1))) { // done this block
+        //   // console.log(state.blockData.index,state.blockData.blocksize);
+
+
+        //   if (state.blockData.status == 0) { // show word
+        //     setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
+        //     showTranslateConfig.show = false;
+        //   } else if (state.blockData.status == 1) { // dont show word
+        //     setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
+        //     showTranslateConfig.show = true;
+        //   }
+        //   dispatch({ type: TypingStateActionType.END_THIS_BLOCK })  
+        // }
+
+
       }
     } else {
       // 用户完成当前章节
@@ -185,6 +199,31 @@ export default function WordPanel() {
     reloadCurrentWordComponent,
   ])
 
+  const tryendblk = useCallback(() => {
+    if (state.blockData.status < 2 && (state.blockData.index == 7 || 
+      (state.chapterData.index == state.chapterData.words.length - 1))) { // done this block
+  // console.log(state.blockData.index,state.blockData.blocksize);
+
+
+      if (state.blockData.status == 0) { // show word
+        setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
+        showTranslateConfig.show = false;
+      } else if (state.blockData.status == 1) { // dont show word
+        setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
+        showTranslateConfig.show = true;
+      }
+      dispatch({ type: TypingStateActionType.END_THIS_BLOCK })  
+    }
+  }
+  , [
+    state.chapterData.index,
+    state.chapterData.words.length,
+    currentWordExerciseCount,
+    loopWordTimes,
+    dispatch,
+    reloadCurrentWordComponent,
+  ])
+
   const onSkipWord = useCallback(
     (type: 'prev' | 'next') => {
       console.log('debug skip word call back')
@@ -220,32 +259,45 @@ export default function WordPanel() {
   useHotkeys(
     'ArrowRight',
     (e) => {
-      // if (state.blockData.status == 0 || state.blockData.status == 2) {
         e.preventDefault()
-        // console.log('debug right key',state.blockData.index , state.blockData.blocksize)
-        // if (state.blockData.status == 0) {
-        //   setWordDictationConfig((old) => ({ ...old, isOpen: false, openBy: 'auto' }))
-        // }
         if (state.blockData.timeoutid) {
           clearTimeout(state.blockData.timeoutid);
           dispatch({ type: TypingStateActionType.SET_TIMEOUT_ID, payload: null })
-          onSkipWord('next')
+          // onSkipWord('next')
+          dispatch({ type: TypingStateActionType.NEXT_WORD })
+          tryendblk();
+          showTranslateConfig.show = false;
+          console.log('debug ArrowRight timeout')
         } else{
           onFinish()
 
         }
-      // }
     },
     { preventDefault: true },
   )
 
 
   const beginTest = useCallback(() => {
-        alert('即将开始单词测试')
-        showTranslateConfig.show = false;
-        setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
-        dispatch({ type: TypingStateActionType.START_CHAPTER_TEST })
-        // console.log('debug tmp', state)
+        if (state.chapterData.index == 0 && state.blockData.status == 0) {
+          console.log('debug beginTest 1')
+          onSkipWord('next')
+          // onFinish()
+          setTimeout(function() {
+            console.log('debug beginTest 2')
+            alert('即将开始单词测试')
+            showTranslateConfig.show = false;
+            setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
+            dispatch({ type: TypingStateActionType.START_CHAPTER_TEST })
+            // console.log('debug tmp', state)
+          }, 200);
+        } else {
+          alert('即将开始单词测试')
+          showTranslateConfig.show = false;
+          setWordDictationConfig((old) => ({ ...old, isOpen: true, openBy: 'auto' }))
+          dispatch({ type: TypingStateActionType.START_CHAPTER_TEST })
+          // console.log('debug tmp', state)
+        }
+
   }, [
     state.chapterData.index,
     state.chapterData.words.length,
