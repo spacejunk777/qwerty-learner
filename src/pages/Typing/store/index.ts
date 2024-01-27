@@ -243,13 +243,15 @@ export const typingReducer = (state: TypingState, action: TypingStateAction) => 
       console.log('end this block', state.blockData.status)
       if (state.blockData.status === 0) {
         state.chapterData.index = state.blockData.reverseIndex;
+        console.log('get reverseIndex', state.blockData.reverseIndex)
         state.blockData.status = 1;
         state.blockData.index = 0
 
         // state.blockData.reverseIndex = state.
       } else {
         state.blockData.status = 0;
-        state.blockData.reverseIndex = state.chapterData.index + 1;
+        state.blockData.reverseIndex = state.chapterData.index ;
+        console.log('set reverseIndex', state.blockData.reverseIndex)
         if (state.chapterData.words.length - state.chapterData.index < 8) {
           state.blockData.blocksize = state.chapterData.words.length - state.chapterData.index;
         } else {
